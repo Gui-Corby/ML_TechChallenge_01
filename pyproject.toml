@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "ml-techchallenge-01"
+version = "0.1.0"
+description = "Tech Challenge - Phase 1"
+authors = ["Joao Andrade <joaogabriel1598@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+fastapi = "^0.100.0" 
+pydantic = "^2.11.4"
+uvicorn = "^0.34.2"
+sqlalchemy = "^2.0.40"
+beautifulsoup4 = "^4.13.4"
+requests = "^2.32.3"
+pyjwt = "^2.10.1"
+passlib = "^1.7.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
