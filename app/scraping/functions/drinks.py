@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from app.scraping.production import URL_TEMPLATE
 
 
-def drinks_scraping(url: str, year: int) -> list:
+def drinks_scraping(url: str, year: int) -> dict:
     url = URL_TEMPLATE.format(year=year)
     all_production_data = []
 
