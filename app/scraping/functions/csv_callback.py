@@ -1,5 +1,5 @@
 import csv
-from app.scraping.functions import YEAR
+# from app.scraping.functions import YEAR
 
 
 def csv_callback(year: int) -> list:
@@ -15,7 +15,7 @@ def csv_callback(year: int) -> list:
         csvreader = csv.DictReader(file, delimiter=";")
         header = csvreader.fieldnames
 
-        if str(YEAR) in header:
+        if str(year) in header:
             for row in csvreader:
                 produto = row['produto'].strip()
                 if produto.isupper():
@@ -24,7 +24,7 @@ def csv_callback(year: int) -> list:
                 data_dict = {
                     "categoria": current_category,
                     "bebida": row['produto'],
-                    "quantidade(L)": row[str(YEAR)]
+                    "quantidade(L)": row[str(year)]
                 }
                 all_production_data.append(data_dict)
             for dict in all_production_data:

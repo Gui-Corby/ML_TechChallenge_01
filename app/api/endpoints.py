@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.scraping.functions.drinks import drinks_scraping
 from app.scraping.functions.csv_callback import csv_callback
 import tracemalloc
-from app.scraping.production import URL
+from app.scraping.production import URL_TEMPLATE
 tracemalloc.start()
 
 router = APIRouter()
@@ -17,7 +17,7 @@ async def hello_world():
 @router.get("/production/{year}")
 async def get_production_data(year: int):
     try:
-        data = drinks_scraping(URL, year)
+        data = drinks_scraping(URL_TEMPLATE, year)
         return data
 
     except Exception:

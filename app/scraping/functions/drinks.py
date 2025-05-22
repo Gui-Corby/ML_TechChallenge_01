@@ -23,7 +23,7 @@ def drinks_scraping(url: str, year: int) -> list:
 
     # Start scraping the page
     soup = BeautifulSoup(response.text, "html.parser")
-    table = soup.find("tbody")
+    table = soup.find("table", class_="tb_base tb_dados")
     if not table:
         print(
             f"No table found at {url} for year {year}. "
@@ -35,11 +35,17 @@ def drinks_scraping(url: str, year: int) -> list:
             status_code=500
         )
     data = table.find_all("tr")
+    year_total = (
+        table.find("tfoot", class_="tb_total")
+        .find_all("td")[1]
+        .text.strip()
+    )
 
     # Getting each item in the rows
     for row in data:
         columns = row.find_all("td")
         category = row.find("td", class_="tb_item")
+
         if category and category.text.strip():
             current_category = category.text.strip()
         if len(columns) >= 2:
@@ -58,8 +64,16 @@ def drinks_scraping(url: str, year: int) -> list:
         del dict['ano']
         if dict['categoria'] == dict['bebida']:
             del dict['bebida']
-            dict['quantidade(L) total'] = dict['quantidade(L)']
+            dict['quantidadeLTotal'] = dict['quantidade(L)']
             del dict['quantidade(L)']
+    all_production_data.pop(-1)
+
     print(f"Year {year} scraped successfully.")
 
-    return all_production_data
+    return {
+        "drinks": all_production_data,
+        "total_ano": year_total
+    }
+
+
+drinks = drinks_scraping(URL_TEMPLATE, 1970)
