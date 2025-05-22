@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
-from app.scraping.functions.drinks import drinks_scraping
-from app.scraping.functions.csv_callback import csv_callback
-from app.core.utils import validate_year
-from app.core.constants import START_YEAR, END_YEAR
+from ..scraping.production import scrape_production_data_from_site
+from ..scraping.functions.csv_callback import csv_callback
+from ..core.utils import validate_year
+from ..core.constants import START_YEAR, END_YEAR
+from ..core.constants import PRODUCTION_BASE_URL as URL_TEMPLATE
 import tracemalloc
-from app.scraping.production import URL_TEMPLATE
 tracemalloc.start()
 
 router = APIRouter()
@@ -23,10 +23,9 @@ async def get_production_data(year: int):
     """
     try:
         validate_year(year, START_YEAR, END_YEAR - 1)
-        data = drinks_scraping(URL_TEMPLATE, year)
+        data = scrape_production_data_from_site(URL_TEMPLATE, year)
         return data
     except HTTPException as e:
-        # Re-raise HTTPExceptions so they propagate as intended.
         raise e
 
     except Exception:
