@@ -3,11 +3,23 @@ import requests
 import time
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
-from ..core.constants import PRODUCTION_BASE_URL as URL_TEMPLATE
+from ..core.constants import PRODUCTION_BASE_URL, PRODUCTION_CSV_COLUMNS
+from ..core.utils import load_from_csv
+
+
+def get_production_data(year: int) -> list[dict]:
+    url = PRODUCTION_BASE_URL.format(year=year)
+
+    try:
+        return scrape_production_data_from_site(url, year)
+    except Exception:
+        return load_from_csv(
+            "app/data/producao.csv", year, PRODUCTION_CSV_COLUMNS
+        )
 
 
 def scrape_production_data_from_site(url: str, year: int) -> dict:
-    url = URL_TEMPLATE.format(year=year)
+    url = PRODUCTION_BASE_URL.format(year=year)
     all_production_data = []
 
     max_attempts = 3
@@ -84,4 +96,4 @@ def scrape_production_data_from_site(url: str, year: int) -> dict:
     }
 
 
-drinks = scrape_production_data_from_site(URL_TEMPLATE, 1970)
+# drinks = scrape_production_data_from_site(url, 1970)
