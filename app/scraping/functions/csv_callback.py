@@ -12,7 +12,7 @@ def csv_callback(year: int) -> list:
         'r'
     ) as file:
 
-        csvreader = csv.DictReader(file, delimiter=";")
+        csvreader = csv.DictReader(file, delimiter="""")
         header = csvreader.fieldnames
 
         if str(year) in header:

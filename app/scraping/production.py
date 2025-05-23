@@ -14,7 +14,7 @@ def get_production_data(year: int) -> list[dict]:
         return scrape_production_data_from_site(url, year)
     except Exception:
         return load_from_csv(
-            "app/data/producao.csv", year, PRODUCTION_CSV_COLUMNS
+            "producao.csv", year, PRODUCTION_CSV_COLUMNS
         )
 
 

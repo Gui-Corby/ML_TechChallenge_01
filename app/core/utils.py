@@ -33,6 +33,7 @@ def load_from_csv(
         reader = csv.reader(csvfile, delimiter="\t")
         header = next(reader)
 
+        print("Header:", header)
         fixed_col_indices = {
             col: i
             for i, col in enumerate(header)
@@ -40,10 +41,14 @@ def load_from_csv(
         }
         year_indices = [i for i, col in enumerate(header) if col == year_str]
 
+        print("Fixed Column Indices:", fixed_col_indices)
+        print("Year Indices:", year_indices)
+
         if not year_indices:
             return []
 
         for row in reader:
+            print("Row:", row)
             if all(not row[i].strip() for i in year_indices):
                 continue
 
