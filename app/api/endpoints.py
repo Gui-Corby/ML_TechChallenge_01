@@ -15,9 +15,13 @@ async def hello_world():
 
 # Endpoint to get production data for a specific year.
 @router.get("/production/{year}", summary="Import data for a specific year")
-async def get_production_data_by_year(year: int):
+async def get_production_data_by_year(
+    year: int,
+    limit: int | None = None,
+    offset: int | None = None
+):
     """
-    Returns production data for a specific year.
+    Returns production data for a specific year, optionally paginated.
     """
     try:
         validate_year(year, START_YEAR, END_YEAR - 1)
@@ -28,4 +32,10 @@ async def get_production_data_by_year(year: int):
     if data is None:
         raise HTTPException(status_code=500,
                             detail="Failed to retrieve production data")
+
+    if offset:
+        data = data[offset:]
+    if limit:
+        data = data[:limit]
+
     return data

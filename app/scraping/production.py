@@ -22,7 +22,7 @@ def scrape_production_data_from_site(url: str, year: int) -> dict:
     url = PRODUCTION_BASE_URL.format(year=year)
     all_production_data = []
 
-    max_attempts = 3
+    max_attempts = 20
     attempt = 0
 
     while attempt < max_attempts:
@@ -86,6 +86,8 @@ def scrape_production_data_from_site(url: str, year: int) -> dict:
             del dict['bebida']
             dict['quantidadeLTotal'] = dict['quantidadeL']
             del dict['quantidadeL']
+        if dict['quantidadeL'] == '-':
+            dict['quantidadeL'] = '0'
     all_production_data.pop(-1)
 
     print(f"Year {year} scraped successfully.")
