@@ -11,18 +11,20 @@ def get_production_data(year: int) -> list[dict]:
     url = PRODUCTION_BASE_URL.format(year=year)
 
     try:
-        return scrape_production_data_from_site(url, year)
+        data = scrape_production_data_from_site(url, year)
+        return (False, data)
     except Exception:
-        return load_from_csv(
+        data = load_from_csv(
             "producao.csv", year, PRODUCTION_CSV_COLUMNS
         )
+        return (True, data)
 
 
-def scrape_production_data_from_site(url: str, year: int) -> dict:
+def scrape_production_data_from_site(url: str, year: int) -> list[dict]:
     url = PRODUCTION_BASE_URL.format(year=year)
     all_production_data = []
 
-    max_attempts = 20
+    max_attempts = 10
     attempt = 0
 
     while attempt < max_attempts:
@@ -77,6 +79,9 @@ def scrape_production_data_from_site(url: str, year: int) -> dict:
                 "bebida": drink,
                 "quantidadeL": quantity
             }
+            if drink.lower() == "total":
+                continue
+
             all_production_data.append(data_dict)
 
     # removing redundant data
@@ -86,16 +91,49 @@ def scrape_production_data_from_site(url: str, year: int) -> dict:
             del dict['bebida']
             dict['quantidadeLTotal'] = dict['quantidadeL']
             del dict['quantidadeL']
-        if dict['quantidadeL'] == '-':
+        if dict.get('quantidadeL', None) == '-':
             dict['quantidadeL'] = '0'
-    all_production_data.pop(-1)
 
-    print(f"Year {year} scraped successfully.")
-
-    return {
-        "drinks": all_production_data,
+    all_production_data.append({
         "total_ano": year_total
-    }
+    })
+
+    return all_production_data
 
 
-# drinks = scrape_production_data_from_site(url, 1970)
+# formatting data for csv output
+def format_production_data(
+    data: list[dict],
+    year: int
+) -> list[dict]:
+    year_str = str(year)
+    formatted = []
+    last_category = None
+    year_total = 0
+
+    for item in data:
+        product = item.get("bebida", item.get("produto", "")).strip()
+        if product.isupper():
+            last_category = product
+
+        item = {
+            "categoria": last_category,
+            "bebida": product,
+            "quantidadeL": item.get(year_str, "")
+        }
+
+        formatted.append(item)
+
+    for item in formatted:
+        if item["categoria"] == item["bebida"]:
+            del item["bebida"]
+            item["quantidadeLTotal"] = item["quantidadeL"]
+            del item["quantidadeL"]
+        item.get("quantidadeLTotal", "0")
+        year_total += int(item.get("quantidadeLTotal", 0))
+
+    formatted.append({
+        "total_ano": str(year_total)
+    })
+
+    return formatted

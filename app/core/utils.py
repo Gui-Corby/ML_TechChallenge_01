@@ -61,9 +61,4 @@ def load_from_csv(
                 item[col_name] = row[i].strip()
 
                 result.append(item)
-
-        for item in result:
-            item["quantidadeL"] = item[year_str]
-            del item[year_str]
-
     return result
