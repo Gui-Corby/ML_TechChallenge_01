@@ -7,24 +7,25 @@ from ..core.constants import PRODUCTION_BASE_URL, PRODUCTION_CSV_COLUMNS
 from ..core.utils import load_from_csv
 
 
+# Will try to scrape or load from csv
 def get_production_data(year: int) -> list[dict]:
     url = PRODUCTION_BASE_URL.format(year=year)
 
     try:
         data = scrape_production_data_from_site(url, year)
-        return (False, data)
+        return (True, data)
     except Exception:
         data = load_from_csv(
             "producao.csv", year, PRODUCTION_CSV_COLUMNS
         )
-        return (True, data)
+        return (False, data)
 
 
 def scrape_production_data_from_site(url: str, year: int) -> list[dict]:
     url = PRODUCTION_BASE_URL.format(year=year)
     all_production_data = []
 
-    max_attempts = 10
+    max_attempts = 3
     attempt = 0
 
     while attempt < max_attempts:
@@ -84,7 +85,7 @@ def scrape_production_data_from_site(url: str, year: int) -> list[dict]:
 
             all_production_data.append(data_dict)
 
-    # removing redundant data
+    # formatting and removing redundant data
     for dict in all_production_data:
         del dict['ano']
         if dict['categoria'] == dict['bebida']:

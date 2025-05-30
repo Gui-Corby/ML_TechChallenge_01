@@ -28,7 +28,7 @@ async def get_production_data_by_year(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    was_csv, data = get_production_data(year)
+    is_scraped, data = get_production_data(year)
 
     if not data:
         raise HTTPException(
@@ -36,7 +36,7 @@ async def get_production_data_by_year(
             detail="Failed to retrieve production data"
         )
 
-    if was_csv:
+    if not is_scraped:
         data = format_production_data(data, year)
 
     if offset:
