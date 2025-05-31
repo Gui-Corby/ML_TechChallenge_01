@@ -28,6 +28,7 @@ def load_from_csv(
     year_str = str(year)
     result = []
 
+
     full_csv_path = os.path.join(DATA_DIR, csv_path)
 
     with open(full_csv_path, newline="", encoding="utf-8") as csvfile:
@@ -54,4 +55,5 @@ def load_from_csv(
                 item[col_name] = row[i].strip()
 
             result.append(item)
+            
     return result

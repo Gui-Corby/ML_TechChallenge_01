@@ -2,15 +2,49 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 import logging
 
-from app.core.constants import COMMERCIALIZATION_START_YEAR, COMMERCIALIZATION_END_YEAR, END_EXPORT_YEAR, EXPORT_CATEGORY_MAP, IMPORT_CATEGORY_MAP, END_IMPORT_YEAR, START_EXPORT_YEAR, START_IMPORT_YEAR
+from app.core.constants import COMMERCIALIZATION_START_YEAR, COMMERCIALIZATION_END_YEAR, END_EXPORT_YEAR, EXPORT_CATEGORY_MAP, IMPORT_CATEGORY_MAP, END_IMPORT_YEAR, PRODUCTION_END_YEAR, PRODUCTION_START_YEAR, START_EXPORT_YEAR, START_IMPORT_YEAR
 from app.core.utils import validate_category, validate_year
 from app.scraping.commercialization_tab import format_commercialization_data, get_commercialization_data
 from app.scraping.export_tab import format_export_data, get_export_data
 from app.scraping.import_tab import format_import_data, get_import_data
+from app.scraping.production_tab import format_production_data, get_production_data
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+
+# Endpoint to get production data for a specific year.
+@router.get("/production/{year}", summary="Import data for a specific year")
+async def get_production_data_by_year(
+    year: int,
+    limit: int | None = None,
+    offset: int | None = None
+):
+    """
+    Returns production data for a specific year, optionally paginated.
+    """
+    try:
+        validate_year(year, PRODUCTION_START_YEAR, PRODUCTION_END_YEAR)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    is_scraped, data = get_production_data(year)
+
+    if not data:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to retrieve production data"
+        )
+
+    if not is_scraped:
+        data = format_production_data(data, year)
+
+    if offset:
+        data = data[offset:]
+    if limit:
+        data = data[:limit]
+
+    return data
 
 @router.get("/commercialization/{year}", summary="Import data for a specific year")
 async def get_commercialization_data_by_year(
