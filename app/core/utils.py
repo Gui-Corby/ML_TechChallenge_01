@@ -5,19 +5,20 @@ from fastapi import HTTPException
 
 from app.core.constants import DATA_DIR
 
-
 def validate_year(year: int, start_year: int, end_year: int):
     if year < start_year or year > end_year:
         raise HTTPException(
             status_code=400,
-            detail=(
-                (
-                    f"Year out of range. Available range: {start_year} to "
-                    f"{end_year}"
-                )
-            )
+            detail=f"Year out of range. Available range: {start_year} to {end_year}"
         )
 
+def validate_category(category: str, allowed_categories: list[str]):
+    if category not in allowed_categories:
+        available = ", ".join(allowed_categories)
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid category. Available categories: {available}"
+        )
 
 def load_from_csv(
     csv_path: str,
@@ -33,16 +34,8 @@ def load_from_csv(
         reader = csv.reader(csvfile, delimiter="\t")
         header = next(reader)
 
-        #print("Header:", header)
-        fixed_col_indices = {
-            col: i
-            for i, col in enumerate(header)
-            if col in columns
-        }
+        fixed_col_indices = {col: i for i, col in enumerate(header) if col in columns}
         year_indices = [i for i, col in enumerate(header) if col == year_str]
-
-        #print("Fixed Column Indices:", fixed_col_indices)
-        #print("Year Indices:", year_indices)
 
         if not year_indices:
             return []
@@ -57,14 +50,9 @@ def load_from_csv(
                 item[col] = row[i].strip()
 
             for idx, i in enumerate(year_indices):
-                col_name = (
-                    year_str
-                    if len(year_indices) == 1
-                    else f"{year_str}_{idx+1}"
-                )
+                col_name = year_str if len(year_indices) == 1 else f"{year_str}_{idx+1}"
                 item[col_name] = row[i].strip()
 
-                result.append(item)
-
+            result.append(item)
 
     return result
