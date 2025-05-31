@@ -54,5 +54,4 @@ def load_from_csv(
                 item[col_name] = row[i].strip()
 
             result.append(item)
-
     return result
