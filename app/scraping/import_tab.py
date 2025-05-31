@@ -1,23 +1,18 @@
 from typing import Optional
 from bs4 import BeautifulSoup
 import requests
-import os
-import csv
-from app.core.constants import EXPORT_BASE_URL, EXPORT_CATEGORY_MAP, EXPORT_CSV_COLUMNS
+from app.core.constants import IMPORT_BASE_URL, IMPORT_CATEGORY_MAP, IMPORT_CSV_COLUMNS
 from app.core.utils import load_from_csv
 
 
 def get_import_data(category: str, year: int) -> list[dict]:
-    config = EXPORT_CATEGORY_MAP.get(category)
-    url = EXPORT_BASE_URL.format(year=year, suboption=config["suboption"])
-    try:
-        return scrape_import_data_from_site(url, year)
-        print(f"Scraped data from {url} successfully.")
-    except Exception:
-        print(f"Failed to scrape data from {url}. Loading from CSV instead.")
-        print("Arquivo",config['data_path'])
-        return load_from_csv(config["data_path"], year, EXPORT_CSV_COLUMNS)
+    config = IMPORT_CATEGORY_MAP.get(category)
+    url = IMPORT_BASE_URL.format(year=year, suboption=config["suboption"])
 
+    try:
+       return scrape_import_data_from_site(url, year)
+    except Exception:
+        return load_from_csv(config["data_path"], year, IMPORT_CSV_COLUMNS)
 
 def scrape_import_data_from_site(url: str, year: int) -> list[dict]:
 
@@ -46,7 +41,7 @@ def scrape_import_data_from_site(url: str, year: int) -> list[dict]:
             f"{year}_1": amount_raw,
             f"{year}_2": value_raw
         })
-    print(f"Scraped data from {url} successfully.")
+
     return data
 
 def format_import_data(
@@ -67,6 +62,9 @@ def format_import_data(
         amount = int(amount_str) if amount_str != "-" else 0
         value = int(value_str) if value_str != "-" else 0
 
+        if amount == 0 and value == 0:
+            continue
+
         item = {
             "País": country,
             "Quantidade (Kg)": amount,
@@ -80,3 +78,4 @@ def format_import_data(
         formatted.append(item)
 
     return formatted
+
