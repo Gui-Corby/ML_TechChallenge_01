@@ -89,7 +89,7 @@ def scrape_commercialization_of_the_year(url: str, year: int) -> dict:
                 "ano": year,
                 "categoria": current_category,
                 "bebida": drink,
-                "quantidadeL": quantity
+                "quantidadeL": quantity.replace('.','')
             }
             if drink.lower() == "total":
                 continue
