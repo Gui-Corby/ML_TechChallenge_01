@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException
-import tracemalloc
+import logging
+
 from ..scraping.production import get_production_data, format_production_data
 from ..core.utils import validate_year
 from ..core.constants import START_YEAR, END_YEAR
-tracemalloc.start()
 
+
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 

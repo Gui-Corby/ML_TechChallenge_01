@@ -78,7 +78,7 @@ def scrape_production_data_from_site(url: str, year: int) -> list[dict]:
                 "ano": year,
                 "categoria": current_category,
                 "bebida": drink,
-                "quantidadeL": quantity
+                "quantidadeL": quantity.replace(".", "")
             }
             if drink.lower() == "total":
                 continue
