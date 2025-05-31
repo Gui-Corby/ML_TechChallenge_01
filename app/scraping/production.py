@@ -96,7 +96,7 @@ def scrape_production_data_from_site(url: str, year: int) -> list[dict]:
             dict['quantidadeL'] = '0'
 
     all_production_data.append({
-        "total_ano": year_total
+        "total_ano": year_total.replace(".", "")
     })
 
     return all_production_data
