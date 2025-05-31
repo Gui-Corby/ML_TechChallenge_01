@@ -1,4 +1,18 @@
-import os 
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+COMMERCIALIZATION_START_YEAR = 1970
+COMMERCIALIZATION_END_YEAR = 2024
+START_IMPORT_YEAR = 1970
+END_IMPORT_YEAR = 2024
+
+COMMERCIALIZATION_BASE_URL = "http://vitibrasil.cnpuv.embrapa.br/index.php?ano={year}&opcao=opt_04"
+IMPORT_BASE_URL = "http://vitibrasil.cnpuv.embrapa.br/index.php?ano={year}&opcao=opt_05&subopcao={suboption}"
+
+COMMERCIALIZATION_CSV_COLUMNS = ["produto"]
+IMPORT_CSV_COLUMNS = ["País"]
 
 IMPORT_CATEGORY_MAP = {
     "vinhos": {"suboption": "subopt_01", "data_path": "import_vinhos.csv", "name": "Vinhos de mesa"},
@@ -8,11 +22,4 @@ IMPORT_CATEGORY_MAP = {
     "suco_uva": {"suboption": "subopt_05", "data_path": "import_suco_uva.csv", "name": "Suco de uva"},
 }
 
-START_IMPORT_YEAR = 1970
-END_IMPORT_YEAR = 2024
 
-IMPORT_BASE_URL = "http://vitibrasil.cnpuv.embrapa.br/index.php?ano={year}&opcao=opt_05&subopcao={suboption}"
-IMPORT_CSV_COLUMNS = ["País"]
-
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
