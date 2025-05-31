@@ -48,7 +48,6 @@ def load_from_csv(
             return []
 
         for row in reader:
-            #print("Row:", row)
             if all(not row[i].strip() for i in year_indices):
                 continue
 
@@ -67,8 +66,5 @@ def load_from_csv(
 
                 result.append(item)
 
-        for item in result:
-            item["quantidadeL"] = item[year_str]
-            del item[year_str]
 
     return result

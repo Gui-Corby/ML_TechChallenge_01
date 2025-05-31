@@ -1,6 +1,7 @@
-from bs4 import BeautifulSoup
 import requests
 import time
+import logging
+from bs4 import BeautifulSoup
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from app.core.constants import COMMERCIALIZATION_BASE_URL, COMMERCIALIZATION_CSV_COLUMNS
@@ -9,14 +10,19 @@ from ..core.utils import load_from_csv
 
 def get_commercialization_data(year: int) -> list[dict]:
 
+    MensagemLog = logging.getLogger('uvicorn.error')
+    MensagemLog.setLevel(logging.INFO)
+
     url = COMMERCIALIZATION_BASE_URL.format(year=year)
 
     try:
-        return scrape_commercialization_of_the_year(url, year)
+        data = scrape_commercialization_of_the_year(url, year)
+        MensagemLog.info('Scrapped from site')
+        return (True, data)
     except Exception:
-        return load_from_csv(
-            "comercializacao.csv", year, COMMERCIALIZATION_CSV_COLUMNS
-        )
+        data = load_from_csv("comercializacao.csv", year, COMMERCIALIZATION_CSV_COLUMNS)
+        MensagemLog.info('Scrapped from csv')
+        return(False, data)
 
 def scrape_commercialization_of_the_year(url: str, year: int) -> dict:
     """Retorna a comercialização de vinho do ano
@@ -27,6 +33,9 @@ def scrape_commercialization_of_the_year(url: str, year: int) -> dict:
     Returns:
         dict: Dicionário contendo os tipos de vinho e quantidade comercializada no ano
     """
+    MensagemLog = logging.getLogger('uvicorn.error')
+    MensagemLog.setLevel(logging.INFO)
+
     all_commercialization_data = []
 
     max_attempts = 20
@@ -82,6 +91,9 @@ def scrape_commercialization_of_the_year(url: str, year: int) -> dict:
                 "bebida": drink,
                 "quantidadeL": quantity
             }
+            if drink.lower() == "total":
+                continue
+
             all_commercialization_data.append(data_dict)
 
     for dict in all_commercialization_data:
@@ -90,11 +102,52 @@ def scrape_commercialization_of_the_year(url: str, year: int) -> dict:
             del dict['bebida']
             dict['quantidadeLTotal'] = dict['quantidadeL']
             del dict['quantidadeL']
-    all_commercialization_data.pop(-1)
+        if dict.get('quantidadeL', None) == '-':
+            dict['quantidadeL'] = '0'
+    
+    #all_commercialization_data.pop(-1)
 
-    print(f"Year {year} scraped successfully.")
+    #print()
+    MensagemLog.info(f"Year {year} scraped successfully.")
 
-    return {
-        "drinks": all_commercialization_data,
+    all_commercialization_data.append({
         "total_ano": year_total
-    }
+    })
+
+    return all_commercialization_data
+
+def format_commercialization_data(
+    data: list[dict],
+    year: int
+) -> list[dict]:
+    year_str = str(year)
+    formatted = []
+    last_category = None
+    year_total = 0
+
+    for item in data:
+        product = item.get("bebida", item.get("produto", "")).strip()
+        if product.isupper():
+            last_category = product
+
+        item = {
+            "categoria": last_category,
+            "bebida": product,
+            "quantidadeL": item.get(year_str, "")
+        }
+
+        formatted.append(item)
+
+    for item in formatted:
+        if item["categoria"] == item["bebida"]:
+            del item["bebida"]
+            item["quantidadeLTotal"] = item["quantidadeL"]
+            del item["quantidadeL"]
+        item.get("quantidadeLTotal", "0")
+        year_total += int(item.get("quantidadeLTotal", 0))
+
+    formatted.append({
+        "total_ano": str(year_total)
+    })
+
+    return formatted

@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException
 import tracemalloc
-from ..scraping.commercialization import get_commercialization_data
+from fastapi import APIRouter, HTTPException
+from ..scraping.commercialization import get_commercialization_data, format_commercialization_data
 from ..core.utils import validate_year
 from ..core.constants import START_YEAR, END_YEAR
 
@@ -27,10 +27,14 @@ async def get_commercialization_data_by_year(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    data = get_commercialization_data(year)
-    if data is None:
+    is_scraped, data = get_commercialization_data(year)
+
+    if not data:
         raise HTTPException(status_code=500,
                             detail="Failed to retrieve commercialization data")
+    
+    if not is_scraped:
+        data = format_commercialization_data(data, year)
     
     if offset:
         data = data[offset:]
