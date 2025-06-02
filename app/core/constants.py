@@ -5,14 +5,14 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 
 PRODUCTION_START_YEAR = 1970
 PRODUCTION_END_YEAR = 2024
-START_PROCESSING_YEAR = 1970
-END_PROCESSING_YEAR = 2024
+PROCESSING_START_YEAR = 1970
+PROCESSING_END_YEAR = 2024
 COMMERCIALIZATION_START_YEAR = 1970
 COMMERCIALIZATION_END_YEAR = 2024
-START_IMPORT_YEAR = 1970
-END_IMPORT_YEAR = 2024
-START_EXPORT_YEAR = 1970
-END_EXPORT_YEAR = 2024
+IMPORT_START_YEAR = 1970
+IMPORT_END_YEAR = 2024
+EXPORT_START_YEAR = 1970
+EXPORT_END_YEAR = 2024
 
 PRODUCTION_BASE_URL = "http://vitibrasil.cnpuv.embrapa.br/index.php?ano={year}&opcao=opt_02"
 PROCESSING_BASE_URL = "http://vitibrasil.cnpuv.embrapa.br/index.php?ano={year}&opcao=opt_03&subopcao={suboption}"
@@ -27,11 +27,10 @@ IMPORT_CSV_COLUMNS = ["País"]
 EXPORT_CSV_COLUMNS = ["País"]
 
 PROCESSING_CATEGORY_MAP = {
-    "ProcessaViniferas": {"suboption": "subopt_01", "data_path": "ProcessaViniferas.csv", "name": "Viniferas"},
-    "ProcessaAmericanas": {"suboption": "subopt_02", "data_path": "ProcessaAmericanas.csv", "name": "Americanas e hibridas"}, 
-    "ProcessaMesa": {"suboption": "subopt_03", "data_path": "ProcessaMesa.csv", "name": "Uvas de mesa"},
-    "ProcessaSemclass": {"suboption": "subopt_04", "data_path": "ProcessaSemclass.csv", "name": "Sem classificacao"},
-    
+    "viniferas": {"suboption": "subopt_01", "data_path": "processing_viniferas.csv", "name": "Viniferas"},
+    "americanas": {"suboption": "subopt_02", "data_path": "processing_americanas.csv", "name": "Americanas e hibridas"}, 
+    "uva_mesa": {"suboption": "subopt_03", "data_path": "processing_uva_mesa.csv", "name": "Uvas de mesa"},
+    "sem_class": {"suboption": "subopt_04", "data_path": "processing_sem_class.csv", "name": "Sem classificacao"},
 }    
 IMPORT_CATEGORY_MAP = {
     "vinhos": {"suboption": "subopt_01", "data_path": "import_vinhos.csv", "name": "Vinhos de mesa"},
@@ -46,3 +45,5 @@ EXPORT_CATEGORY_MAP = {
     "uvas_frescas": {"suboption": "subopt_03", "data_path": "export_uvas_frescas.csv", "name": "Uvas frescas"},
     "suco_uva": {"suboption": "subopt_04", "data_path": "export_suco_uva.csv", "name": "Suco de uva"},
 }
+PRODUCTION_CSV_PATH = "production.csv"
+COMMERCIALIZATION_CSV_PATH = "commercialization.csv"

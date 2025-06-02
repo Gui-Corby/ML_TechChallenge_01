@@ -66,14 +66,14 @@ def format_import_data(
             continue
 
         item = {
-            "País": country,
-            "Quantidade (Kg)": amount,
-            "Valor (US$)": value
+            "country": country,
+            "amount": amount,
+            "value": value
         }
 
         if include_year_and_category:
-            item["Ano"] = year
-            item["Categoria"] = category
+            item["year"] = year
+            item["category"] = category
 
         formatted.append(item)
 

@@ -32,14 +32,13 @@ def scrape_processing_data_from_site(url: str, year: int) -> list[dict]:
         if len(columns) != 2:
             continue
 
-        cultive = columns[0].get_text(strip=True)
+        cultivate = columns[0].get_text(strip=True)
         amount_raw = columns[1].get_text(strip=True)
         
 
         data.append({
-            "Cultivar": cultive,
+            "cultivar": cultivate,
             f"{year}": amount_raw,
-            
         })
 
     return data
@@ -52,26 +51,32 @@ def format_processing_data(
 ) -> list[dict]:
     formatted = []
     amount_key = f"{year}"
+    processing_type = ""
 
 
     for row in data:
-        cultive = row["cultivar"]
+        cultivate = row["cultivar"]
         amount_str = row.get(amount_key, "-").replace(".", "")
     
         amount = int(amount_str) if amount_str != "-" else 0
-    
 
+        if cultivate.isupper():
+            processing_type = cultivate
+            continue
         if amount == 0:
             continue
 
         item = {
-            "Cultivar": cultive,
-            "Quantidade (Kg)": amount
+            "cultivate": cultivate,
+            "amount": amount,
         }
+        
+        if processing_type:
+            item["type"] = processing_type
 
         if include_year_and_category:
-            item["Ano"] = year
-            item["Categoria"] = category
+            item["year"] = year
+            item["category"] = category
 
         formatted.append(item)
 
