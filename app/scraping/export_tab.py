@@ -1,48 +1,32 @@
 from typing import Optional
-from bs4 import BeautifulSoup
-import requests
 from app.core.constants import EXPORT_BASE_URL, EXPORT_CATEGORY_MAP, EXPORT_CSV_COLUMNS
-from app.core.utils import load_from_csv
+from app.core.utils import load_from_csv, scrape_table_data_from_site
 
 
 def get_export_data(category: str, year: int) -> list[dict]:
     config = EXPORT_CATEGORY_MAP.get(category)
     url = EXPORT_BASE_URL.format(year=year, suboption=config["suboption"])
-   
+
     try:
-        return scrape_export_data_from_site(url, year)
+        return scrape_table_data_from_site(
+            url,
+            year,
+            parse_row_fn=parse_export_row,
+            expected_col_range=(3, 3)
+        )
     except Exception:
         return load_from_csv(config["data_path"], year, EXPORT_CSV_COLUMNS)
 
-def scrape_export_data_from_site(url: str, year: int) -> list[dict]:
+def parse_export_row(columns, year: int) -> dict:
+    country = columns[0].get_text(strip=True)
+    amount = columns[1].get_text(strip=True)
+    value = columns[2].get_text(strip=True)
 
-    response = requests.get(url, timeout=10)
-    response.raise_for_status()
-
-    soup = BeautifulSoup(response.text, "html.parser")
-    data_table = soup.find("table", class_="tb_base tb_dados")
-    if not data_table:
-        raise ValueError("Data table not found")
-
-    rows = data_table.find("tbody").find_all("tr")
-    data = []
-
-    for tr in rows:
-        columns = tr.find_all("td")
-        if len(columns) != 3:
-            continue
-
-        country = columns[0].get_text(strip=True)
-        amount_raw = columns[1].get_text(strip=True)
-        value_raw = columns[2].get_text(strip=True)
-
-        data.append({
-            "País": country,
-            f"{year}_1": amount_raw,
-            f"{year}_2": value_raw
-        })
-
-    return data
+    return {
+        "País": country,
+        f"{year}_1": amount,
+        f"{year}_2": value
+    }
 
 def format_export_data(
     data: list[dict],

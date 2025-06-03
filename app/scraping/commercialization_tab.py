@@ -1,47 +1,28 @@
-from typing import Optional
-from bs4 import BeautifulSoup
-import requests
 from app.core.constants import COMMERCIALIZATION_BASE_URL, COMMERCIALIZATION_CSV_PATH, COMMERCIALIZATION_CSV_COLUMNS
-from app.core.utils import load_from_csv
+from app.core.utils import load_from_csv, scrape_table_data_from_site
 
 
 def get_commercialization_data(year: int) -> list[dict]:
     url = COMMERCIALIZATION_BASE_URL.format(year=year)
-   
+
     try:
-        return scrape_commercialization_data_from_site(url, year)
+        return scrape_table_data_from_site(
+            url,
+            year,
+            parse_row_fn=parse_commercialization_row,
+            expected_col_range=(2, 2)
+        )
     except Exception:
         return load_from_csv(COMMERCIALIZATION_CSV_PATH, year, COMMERCIALIZATION_CSV_COLUMNS)
 
+def parse_commercialization_row(columns, year: int) -> dict:
+    product = columns[0].get_text(strip=True)
+    amount = columns[1].get_text(strip=True)
 
-def scrape_commercialization_data_from_site(url: str, year: int) -> list[dict]:
-
-    response = requests.get(url, timeout=10)
-    response.raise_for_status()
-
-    soup = BeautifulSoup(response.text, "html.parser")
-    data_table = soup.find("table", class_="tb_base tb_dados")
-    if not data_table:
-        raise ValueError("Data table not found")
-
-    rows = data_table.find("tbody").find_all("tr")
-    data = []
-
-    for tr in rows:
-        columns = tr.find_all("td")
-        if len(columns) != 2:
-            continue
-
-        product = columns[0].get_text(strip=True)
-        amount_raw = columns[1].get_text(strip=True)
-        
-
-        data.append({
-            "produto": product,
-            f"{year}": amount_raw,
-        })
-
-    return data
+    return {
+        "produto": product,
+        f"{year}": amount
+    }
 
 def format_commercialization_data(
     data: list[dict],

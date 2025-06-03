@@ -1,7 +1,9 @@
 import csv
 import os
-from typing import List, Dict
+from typing import Callable, List, Dict, Optional
+from bs4 import BeautifulSoup
 from fastapi import HTTPException
+import requests
 
 from app.core.constants import DATA_DIR
 
@@ -57,3 +59,31 @@ def load_from_csv(
             result.append(item)
             
     return result
+
+def scrape_table_data_from_site(
+    url: str,
+    year: int,
+    parse_row_fn: Callable[[list, int], Optional[dict]],
+    expected_col_range: tuple[int, int]
+) -> list[dict]:
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    table = soup.find("table", class_="tb_base tb_dados")
+    if not table:
+        raise ValueError("Data table not found")
+
+    rows = table.find("tbody").find_all("tr")
+    data = []
+
+    for tr in rows:
+        columns = tr.find_all("td")
+        if not expected_col_range[0] <= len(columns) <= expected_col_range[1]:
+            continue
+
+        parsed = parse_row_fn(columns, year)
+        if parsed:
+            data.append(parsed)
+
+    return data

@@ -3,7 +3,7 @@ from app.api.commercialization_tab_routes import router as commercialization_rou
 from app.api.export_tab_routes import router as export_router
 from app.api.import_tab_routes import router as import_router
 from app.api.processing_tab_routes import router as processing_router
-from app.api.production_routes import router as production_router
+from app.api.production_tab_routes import router as production_router
 
 app = FastAPI(
     title="API Exportações Vitibrasil",
