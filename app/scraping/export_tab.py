@@ -1,24 +1,23 @@
 from typing import Optional
-from app.core.constants import IMPORT_BASE_URL, IMPORT_CATEGORY_MAP, IMPORT_CSV_COLUMNS
+from app.core.constants import EXPORT_BASE_URL, EXPORT_CATEGORY_MAP, EXPORT_CSV_COLUMNS
 from app.core.utils import load_from_csv, scrape_table_data_from_site
 
 
-def get_import_data(category: str, year: int) -> list[dict]:
-    config = IMPORT_CATEGORY_MAP.get(category)
-    url = IMPORT_BASE_URL.format(year=year, suboption=config["suboption"])
+def get_export_data(category: str, year: int) -> list[dict]:
+    config = EXPORT_CATEGORY_MAP.get(category)
+    url = EXPORT_BASE_URL.format(year=year, suboption=config["suboption"])
 
     try:
         return scrape_table_data_from_site(
             url,
             year,
-            parse_row_fn=parse_import_row,
+            parse_row_fn=parse_export_row,
             expected_col_range=(3, 3)
         )
     except Exception:
-        return load_from_csv(config["data_path"], year, IMPORT_CSV_COLUMNS)
+        return load_from_csv(config["data_path"], year, EXPORT_CSV_COLUMNS)
 
-
-def parse_import_row(columns, year: int) -> dict:
+def parse_export_row(columns, year: int) -> dict:
     country = columns[0].get_text(strip=True)
     amount = columns[1].get_text(strip=True)
     value = columns[2].get_text(strip=True)
@@ -29,8 +28,7 @@ def parse_import_row(columns, year: int) -> dict:
         f"{year}_2": value
     }
 
-
-def format_import_data(
+def format_export_data(
     data: list[dict],
     year: int,
     category: Optional[str] = None,
@@ -54,7 +52,7 @@ def format_import_data(
         item = {
             "country": country,
             "amount": amount,
-            "value": value,
+            "value": value
         }
 
         if include_year_and_category:

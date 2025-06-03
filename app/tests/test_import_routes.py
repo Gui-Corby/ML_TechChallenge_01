@@ -1,8 +1,4 @@
 from http import HTTPStatus
-
-from fastapi.testclient import TestClient
-
-from app.main import app
 from .constants import (
     IMPORT_VALID_CATEGORY,
     INVALID_CATEGORY,
@@ -18,9 +14,9 @@ def test_get_import_data_valid(client):
     data = response.json()
     if response.status_code == HTTPStatus.OK:
         assert isinstance(data, list)
-        assert all("País" in item for item in data)
-        assert all("Quantidade (Kg)" in item for item in data)
-        assert all("Valor (US$)" in item for item in data)
+        assert all("country" in item for item in data)
+        assert all("amount" in item for item in data)
+        assert all("value" in item for item in data)
 
 
 def test_get_import_data_invalid_category(client):
@@ -42,11 +38,13 @@ def test_get_import_data_invalid_year_high(client):
 
 
 def test_get_all_import_data(client):
-    response = client.get(f"{BASE_IMPORT_URL}/all")
+    response = client.get(f"{BASE_IMPORT_URL}/all", params={"offset": 0, "limit": 10})
     assert response.status_code in [HTTPStatus.OK, HTTPStatus.NO_CONTENT]
     data = response.json()
     if response.status_code == HTTPStatus.OK:
         assert isinstance(data, list)
-        assert all("País" in item for item in data)
-        assert all("Quantidade (Kg)" in item for item in data)
-        assert all("Valor (US$)" in item for item in data)
+        assert all("country" in item for item in data)
+        assert all("amount" in item for item in data)
+        assert all("value" in item for item in data)
+        assert all("category" in item for item in data)
+        assert all("year" in item for item in data)
