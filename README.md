@@ -1,4 +1,3 @@
-
 # ML Tech Challenge - Phase 1
 
 This project is a solution to a machine learning challenge that involves scraping data from various sections (Production, Processing, Commercialization, Import, and Export) from the Embrapa website, and serving this data via a FastAPI application.
@@ -43,20 +42,58 @@ Follow these steps to set up the project for the first time:
 
 Now, you should be able to access the application at `http://127.0.0.1:8000`.
 
-### Project Structure
+## How to Test
 
-- **`app/`**: Main application code
-  - **`scraping/`**: Contains the scraping code for each section.
-    - **`production.py`**: Scraping logic for the Production section.
-    - **`processing.py`**: Scraping logic for the Processing section.
-    - **`commercialization.py`**: Scraping logic for the Commercialization section.
-    - **`import.py`**: Scraping logic for the Import section.
-    - **`export.py`**: Scraping logic for the Export section.
-  - **`core/`**: Utility functions and core logic.
-    - **`utils.py`**: General utility functions.
-  - **`models/`**: Pydantic models and database schemas.
-    - **`schemas.py`**: Data models for validation and response structures.
-  - **`main.py`**: The entry point for the FastAPI application, defining the routes and endpoints.
+The project uses `pytest` for running tests. To run the tests, follow these steps:
+
+1. Make sure your virtual environment is activated (using `poetry shell`).
+
+2. Run the tests with:
+    ```bash
+    pytest
+    ```
+
+3. To run tests with more detailed output, use:
+    ```bash
+    pytest -v
+    ```
+
+All test files are located in the `app/tests/` directory, and they cover the API routes and core logic.
+
+
+## Project Structure
+
+- **`app/`**: Main application code  
+  - **`api/`**: FastAPI route handlers for each data tab  
+    - `commercialization_tab_routes.py`  
+    - `export_tab_routes.py`  
+    - `import_tab_routes.py`  
+    - `processing_tab_routes.py`  
+    - `production_tab_routes.py`  
+  - **`core/`**: Core utilities and constants  
+    - `constants.py`  
+    - `utils.py`  
+  - **`data/`**: CSV files used for loading fallback or cached data  
+    - Commercialization, export, import, processing, production CSVs  
+  - **`scraping/`**: Web scraping logic for each data tab  
+    - `commercialization_tab.py`  
+    - `export_tab.py`  
+    - `import_tab.py`  
+    - `processing_tab.py`  
+    - `production_tab.py`  
+  - **`tests/`**: Test files and test configuration for API routes and core logic  
+    - Tests for commercialization, export, import, processing, production routes  
+  - `main.py`: Application entry point defining the FastAPI app and main routes  
+
+- **`assets/`**: Project-related assets (e.g., architecture diagrams)  
+- `LICENSE`: License file  
+- `poetry.lock`: Dependency lock file managed by Poetry  
+- `pyproject.toml`: Poetry configuration and dependencies  
+- `README.md`: Project documentation  
+
+## Architecture Overview
+
+![Architecture Diagram](assets/architecture-diagram.png)
 
 ### License
 
